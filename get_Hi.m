@@ -1,9 +1,9 @@
-function [Hi] = get_Hi(i,Gamma_dB,K,Na)
+function [Hi] = get_Hi(i,Gamma_dB,K,Na,h_i)
 %UNTITLED6 Summary of this function goes here
 %   Detailed explanation goes here
 
 gamma_i = 10^(Gamma_dB/10);
-h_i = gethi(Na); 
+
 
 % Qk = getQk(Na,h_i,k,K);
 if(i==1)
