@@ -23,13 +23,11 @@ end
 
 t = ones(Na*K,1);
 SNR_ratio_INR = (10^2);
-Po_dBm = 30;%dBm
-P_o = 10^(Po_dBm/10) * 0.001;
+Po = 
 
 wa = find_wa(All_A,t,SNR_ratio_INR,Na,K);
 Rw_over_sigma = get_Rw_over_sigma(All_A,wa,SNR_ratio_INR);
-Z_over_sigma  = Rw_over_sigma + (wa'*wa)/P_o; 
-Omega = 10*All_A{1}*wa*wa'*All_A{1}';
+Z_bysigma  = Rw_over_sigma + (wa'*wa)/ 
 
 
 %%%% There can be something wrong with a'. Matlab might be taking a
