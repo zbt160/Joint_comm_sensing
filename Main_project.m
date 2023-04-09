@@ -28,6 +28,8 @@ Po_dBm = 30;%dBm
 No_dBm = 10;
 P_o = 10^(Po_dBm/10) * 0.001;
 N_o =  10^(Po_dBm/10) * 0.001;
+
+
 wa = find_wa(All_A,t,SNR_ratio_INR,Na,K);
 Rw_over_sigma = get_Rw_over_sigma(All_A,wa,SNR_ratio_INR);
 Z_over_sigma  = Rw_over_sigma + (wa'*wa)/P_o; 
@@ -40,17 +42,22 @@ H1 = get_Hi(1,Gamma_dB,K,Na,h_i);
 H2 = get_Hi(2,Gamma_dB,K,Na,h_i);
 
 cvx_begin sdp
-    variable X(Na*K,Na*K) 
+
+%     cvx_solver_settings('maxiter', 1000, 'tolerance', 1e-6)
+    variable X(Na*K,Na*K) symmetric 
     variable y(1)
     maximize( trace(Omega*X) )
     subject to
-        X>=0;
+%         X>=0;
         y>=0;
         trace(Z_over_sigma*X) == 1; % This might have problem since we are deviding by simga_a^2
         real(trace(H1*X))>=y*N_o;
         real(trace(H2*X))>= y*N_o;
         trace(X) == y*P_o;
 cvx_end
+
+[U,S,V] = svd(X/y);
+t = U(:,1);
 
 
 %%%% There can be something wrong with a'. Matlab might be taking a
