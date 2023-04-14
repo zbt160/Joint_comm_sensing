@@ -22,7 +22,7 @@ for i =1:len_interferences
    All_A{i} =  get_A(K,Theta_values(i),delta,Na);
 end
 
-t = ones(Na*K,1);
+t = ones(Na*K,1)/sqrt(K*P_o*Na);
 SNR_ratio_INR = (10^2);
 Po_dBm = 30;%dBm
 No_dBm = 10;
