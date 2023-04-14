@@ -7,4 +7,3 @@ a_active_theta = exp(j*2*pi*delta*sin(theta_rad)*n)';
 % A = a_active_theta*a_active_theta';
 A = kron(eye(K),a_active_theta*a_active_theta.');
 end
-
