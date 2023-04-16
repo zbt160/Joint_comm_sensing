@@ -5,7 +5,7 @@ function [Rw] = get_Rw_over_sigma(All_A,wa,SNR_ratio)
     for i=1:len
         
         A_thetaM = All_A{i};
-        A_hermM = A_thetaM.';
+        A_hermM = A_thetaM';
         if i==1
             Rw = SNR_ratio*A_hermM*ttH*A_thetaM;
         else

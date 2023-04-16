@@ -22,19 +22,25 @@ for i =1:len_interferences
    All_A{i} =  get_A(K,Theta_values(i),delta,Na);
 end
 
-t = ones(Na*K,1)/sqrt(K*P_o*Na);
+
 SNR_ratio_INR = (10^2);
 Po_dBm = 30;%dBm
 No_dBm = 10;
 P_o = 10^(Po_dBm/10) * 0.001;
+t = ones(Na*K,1)/sqrt(K*P_o*Na);
+
+T=t*t';
+
 N_o =  10^(Po_dBm/10) * 0.001;
 
 
 wa = find_wa(All_A,t,SNR_ratio_INR,Na,K);
 Rw_over_sigma = get_Rw_over_sigma(All_A,wa,SNR_ratio_INR);
 Z_over_sigma  = Rw_over_sigma + (wa'*wa)/P_o; 
-Omega = real(10*All_A{1}*wa*wa'*All_A{1}');
+Omega = 10*All_A{1}*wa*wa'*All_A{1}';
 
+y = 1/(trace(Z_over_sigma*T));
+X= y*T;
 
 %%% Remember to change the channel h_i for each path
 %% CVX Problem setup
@@ -46,18 +52,18 @@ cvx_begin sdp
 %     cvx_solver_settings('maxiter', 1000, 'tolerance', 1e-6)
     variable X(Na*K,Na*K) symmetric 
     variable y(1)
-    maximize( trace(Omega*X) )
+    maximize( real(trace(Omega*X) ))
     subject to
-%         X>=0;
+        X>=0;
         y>=0;
-        trace(Z_over_sigma*X) == 1; % This might have problem since we are deviding by simga_a^2
+        real(Z_over_sigma*X) == 1; % This might have problem since we are deviding by simga_a^2
         real(trace(H1*X))>=y*N_o;
         real(trace(H2*X))>= y*N_o;
-        trace(X) == y*P_o;
+        real(trace(X)) == y*P_o;
 cvx_end
 
-[U,S,V] = svd(X/y);
-t = U(:,1);
+% [U,S,V] = svd(X/y);
+% t = U(:,1);
 
 
 %%%% There can be something wrong with a'. Matlab might be taking a

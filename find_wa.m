@@ -22,7 +22,7 @@ function [sum] = get_Rt_over_sigma(All_A,t,SNR_ratio)
     for i=1:len
         
         A_thetaM = All_A{i};
-        A_hermM = A_thetaM.';
+        A_hermM = A_thetaM';
         if i==1
             sum = SNR_ratio*A_thetaM*ttH*A_hermM;
         else
