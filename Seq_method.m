@@ -16,7 +16,7 @@ Po_dBm = 30;%dBm
 No_dBm = 10;
 P_o = 10^(Po_dBm/10) * 0.001;
 N_o =  10^(Po_dBm/10) * 0.001;
-t = ones(Na*K,1)/sqrt(K*P_o*Na);
+t = ones(Na*K,1)%/sqrt(K*P_o*Na);
 T=t*t';
 
 theta = 30;
@@ -45,27 +45,46 @@ gam_snr_o = real(trace(phi_o*T));
 H1 = get_e23b(1,Gamma_dB,K,Na,h_i,T,N_o); %part of eq(23b) for ii=1
 H2 = get_e23b(2,Gamma_dB,K,Na,h_i,T,N_o); %part of eq(23b) for ii=2
 
-cvx_begin sdp
+tol = 10^3;
+current1 = real(trace(phi_o*T)) ;
 
-%     cvx_solver_settings('maxiter', 1000, 'tolerance', 1e-6)
-    variable T(Na*K,Na*K) symmetric 
+diff_abs = tol+1;
+count = 0;
 
-    maximize( real(trace(phi_o*T)) )
-    subject to
-        T >= 0;
-        real(H1) >= 0;
-        real(H2) >= 0;
-        trace(T) == P_o;
-cvx_end
+while(diff_abs > tol)
+    count = count+1;
+    if(count>100)
+        break;
+    end
+    cvx_begin sdp
 
-L_ch = chol(T, 'lower');
+        %     cvx_solver_settings('maxiter', 1000, 'tolerance', 1e-6)
+        variable T(Na*K,Na*K) symmetric
+    
+        maximize( real(trace(phi_o*T)) )
+        subject to
+            T >= 0;
+            real(H1) >= 0;
+            real(H2) >= 0;
+            trace(T) == P_o;
+    cvx_end
 
-% Extract the vector a from the Cholesky decomposition
-t = L_ch(:,1);
-% threshold condition
-T=t*t';
-%phi_1 = find_wa(All_A,t,SNR_ratio_INR,Na,K);   %finding phi
-%gam_snr_1 = real(trace(phi_1*T));
+    L_ch = chol(T, 'lower');
+    [V,D]=eig(T);
+    % Extract the vector a from the Cholesky decomposition
+    %t = L_ch(:,1);
+    t = V(:,end);
+    % threshold condition
+    %T=t*t';
+    %
+    prev= current1 ;
+    
+    phi_o = find_phi(All_A,t,SNR_ratio_INR,Na,K);   %finding phi
+    %gam_snr_1 = real(trace(phi_o*T));
+    current1 = real(trace(phi_o*T)) ;
+    diff_abs = abs(current1 - prev);
+
+end
 %error_t = abs(gam_snr_1-gam_snr_o);
 
 %if error_t < er_th
