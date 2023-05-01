@@ -19,11 +19,11 @@ function [sum] = get_Rt_over_sigma(All_A,t,SNR_ratio)
 %     DISP("fidnig Rt");
     len = length(All_A);
     ttH = t*t';
-    for i=1:len
+    for i=2:len
         
         A_thetaM = All_A{i};
         A_hermM = A_thetaM';
-        if i==1
+        if i==2
             sum = SNR_ratio*A_thetaM*ttH*A_hermM;
         else
             sum = sum+ SNR_ratio*A_thetaM*ttH*A_hermM;

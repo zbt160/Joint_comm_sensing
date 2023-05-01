@@ -7,13 +7,15 @@ k=1;
 i=1;
 % h_i = gethi(Na); 
 % Qk = getQk(Na,h_i,k,K);
-Gamma_dB = 15; % dB
+Gamma_dB = 6; % dB
 delta = 0.5; % This is a placeholder and need to consult because did not find the value in the paper 
 
 
 theta = 30;
-h_i = gethi(Na); 
-Hi = get_Hi(i,Gamma_dB,K,Na,h_i);
+h_1 = gethi(Na); 
+h_2 = gethi(Na); 
+
+% Hi = get_Hi(i,Gamma_dB,K,Na,h_i);
 Theta_values = [0 -75 -30 30 75];
 % getting all As for the angles
 len_interferences = length(Theta_values);
@@ -44,8 +46,8 @@ X= y*T;
 
 %%% Remember to change the channel h_i for each path
 %% CVX Problem setup
-H1 = get_Hi(1,Gamma_dB,K,Na,h_i);
-H2 = get_Hi(2,Gamma_dB,K,Na,h_i);
+H1 = get_Hi(1,Gamma_dB,K,Na,h_1,h_2);
+H2 = get_Hi(2,Gamma_dB,K,Na,h_2,h_1);
 
 cvx_begin sdp
 
