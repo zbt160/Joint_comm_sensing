@@ -32,7 +32,6 @@ P_o = 10^(Po_dBm/10) * 0.001;
 t = 0.01*ones(Na*K,1)/sqrt(K*P_o*Na);
 
 T=t*t';
-
 N_o =  10^(Po_dBm/10) * 0.001;
 
 

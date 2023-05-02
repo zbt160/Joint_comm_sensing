@@ -12,11 +12,11 @@ delta = 0.5; % This is a placeholder and need to consult because did not find th
 
 
 SNR_ratio_INR = (10^2);
-Po_dBm = 40;%dBm
+Po_dBm = 30;%dBm
 No_dBm = 10;
 P_o = 10^(Po_dBm/10) * 0.001;
 N_o =  10^(Po_dBm/10) * 0.001;
-t = rand(Na*K,1);%/sqrt(K*P_o*Na);
+t = ones(Na*K,1);%/sqrt(K*P_o*Na);
 T=t*t';
 
 theta = 30;
@@ -69,20 +69,18 @@ while(diff_abs > tol)
         maximize( real(trace(phi_o*T)) )
         subject to
             T == semidefinite(Na*K);
-%             T>= 0
-            real(H1) >= 0;
-            real(H2) >= 0;
+            real(get_e23b(1,Gamma_dB,K,Na,h_1,h_2,T,N_o)) >= 0;
+            real(get_e23b(2,Gamma_dB,K,Na,h_2,h_1,T,N_o)) >= 0;
             trace(T) == P_o;
     cvx_end
 
     [V,D]=eig(T);
     t = V(:,end);
-
+%     T = t*t';
     
     prev= current1 ;
     
     phi_o = find_phi(All_A,t,SNR_ratio_INR,Na,K);   %finding phi
-    %gam_snr_1 = real(trace(phi_o*T));
     current1 = real(trace(phi_o*T)) ;
     diff_abs = abs(current1 - prev);
     count = count+1;
