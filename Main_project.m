@@ -50,14 +50,15 @@ H1 = get_Hi(1,Gamma_dB,K,Na,h_1,h_2);
 H2 = get_Hi(2,Gamma_dB,K,Na,h_2,h_1);
 
 cvx_begin sdp
-
+    cvx_solver('sdpt3');
 %     cvx_solver_settings('maxiter', 1000, 'tolerance', 1e-6)
     variable X(Na*K,Na*K) symmetric 
 %     variable y(1)
     maximize( real(trace(Omega*X) ))
     subject to
-        real(X)>=0;
+%         real(X)>=0;
 %         y>=0;
+        X == semidefinite(Na*K);
         trace(Z_over_sigma*X) == 1; % This might have problem since we are deviding by simga_a^2
         real(trace(H1*X))>=y*N_o;
         real(trace(H2*X))>= y*N_o;

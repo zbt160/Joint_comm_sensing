@@ -7,20 +7,22 @@ k=1;
 ii=1;
 % h_i = gethi(Na); 
 % Qk = getQk(Na,h_i,k,K);
-Gamma_dB = 15; % dB
+Gamma_dB = 6; % dB
 delta = 0.5; % This is a placeholder and need to consult because did not find the value in the paper 
 
 
 SNR_ratio_INR = (10^2);
-Po_dBm = 30;%dBm
+Po_dBm = 40;%dBm
 No_dBm = 10;
 P_o = 10^(Po_dBm/10) * 0.001;
 N_o =  10^(Po_dBm/10) * 0.001;
-t = ones(Na*K,1)%/sqrt(K*P_o*Na);
+t = rand(Na*K,1);%/sqrt(K*P_o*Na);
 T=t*t';
 
 theta = 30;
-h_i = gethi(Na); 
+h_1 = gethi(Na); 
+h_2 = gethi(Na); 
+
 %Hi = get_Hi(ii,Gamma_dB,K,Na,h_i,T,N_o);
 Theta_values = [0 -75 -30 30 75];
 % getting all As for the angles
@@ -42,47 +44,48 @@ gam_snr_o = real(trace(phi_o*T));
 
 %%% Remember to change the channel h_i for each path
 %% CVX Problem setup
-H1 = get_e23b(1,Gamma_dB,K,Na,h_i,T,N_o); %part of eq(23b) for ii=1
-H2 = get_e23b(2,Gamma_dB,K,Na,h_i,T,N_o); %part of eq(23b) for ii=2
+H1 = get_e23b(1,Gamma_dB,K,Na,h_1,h_2,T,N_o); %part of eq(23b) for ii=1
+H2 = get_e23b(2,Gamma_dB,K,Na,h_2,h_1,T,N_o); %part of eq(23b) for ii=2
 
-tol = 10^3;
+tol = 10^(-3);
 current1 = real(trace(phi_o*T)) ;
 
 diff_abs = tol+1;
-count = 0;
 
+count = 0;
+count_total =10;
+diff_array = zeros(count_total,1);
 while(diff_abs > tol)
-    count = count+1;
-    if(count>100)
+% for i =1
+    diff_array(count+1) = diff_abs;
+    if(count>10)
         break;
     end
     cvx_begin sdp
 
         %     cvx_solver_settings('maxiter', 1000, 'tolerance', 1e-6)
-        variable T(Na*K,Na*K) symmetric
+        variable T(Na*K,Na*K) complex hermitian
     
         maximize( real(trace(phi_o*T)) )
         subject to
-            T >= 0;
+            T == semidefinite(Na*K);
+%             T>= 0
             real(H1) >= 0;
             real(H2) >= 0;
             trace(T) == P_o;
     cvx_end
 
-    L_ch = chol(T, 'lower');
     [V,D]=eig(T);
-    % Extract the vector a from the Cholesky decomposition
-    %t = L_ch(:,1);
     t = V(:,end);
-    % threshold condition
-    %T=t*t';
-    %
+
+    
     prev= current1 ;
     
     phi_o = find_phi(All_A,t,SNR_ratio_INR,Na,K);   %finding phi
     %gam_snr_1 = real(trace(phi_o*T));
     current1 = real(trace(phi_o*T)) ;
     diff_abs = abs(current1 - prev);
+    count = count+1;
 
 end
 %error_t = abs(gam_snr_1-gam_snr_o);
@@ -103,4 +106,20 @@ disp(t);
 
 %%%% There can be something wrong with a'. Matlab might be taking a
 %%%% transpose but not comjugate so need to confirm that.
-
+%%
+%
+% wa = find_wa(All_A,t,SNR_ratio_INR,Na,K);
+% R_w = get_Rw_over_sigma(All_A,wa,SNR_ratio_INR);
+% 
+% % 
+% n = 0:1:Na-1;
+% theta_array = -90:0.5:90;
+% mag = zeros(length(theta));
+% count = 1;
+% for theta = theta_array
+% %     theta_rad = deg2rad(theta);
+%     a_active_theta = exp(j*2*pi*delta*sind(theta)*n)';
+%     a_final = [a_active_theta;a_active_theta];
+%     mag(count) = a_final'*R_w*a_final;
+%     count = count+1;
+% end
