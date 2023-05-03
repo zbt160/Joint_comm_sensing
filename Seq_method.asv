@@ -92,9 +92,8 @@ T_decomp = t*t';
 
 disp('Optimal t');
 disp(t);
-wa = find_wa(All_A,t,SNR_ratio_INR,Na,K);
 R_t_over_sigma_square = get_Rt_over_sigma(All_A,t,SNR_ratio_INR);
-target = (10*abs(wa'*All_A{1}*t)^2);%10*t'*All_A{1}'*wa*wa'*All_A{1}*t;
+target = ();%10*t'*All_A{1}'*wa*wa'*All_A{1}*t;
 SINR_a = target/(wa'*(R_t_over_sigma_square+eye(Na*K))*wa); 
 
 fin_val = 10*log10(current1);

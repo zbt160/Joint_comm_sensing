@@ -8,18 +8,14 @@ gamma_i = 10^(Gamma_dB/10);
 % Qk = getQk(Na,h_i,k,K);
 if(ii==1)
    val=2;
-%     ha=h_2;
-%     hb=h_1;
+   e23b = (1/gamma_i)*trace(getQk(Na,ha,ii,K)*T) + trace(getQk(Na,ha,val,K)*T)-N_o; 
 else
    val=1; 
-%    ha=h_1;
-%    hb=h_2;
+   e23b = (1/gamma_i)*trace(getQk(Na,hb,ii,K)*T) + trace(getQk(Na,hb,val,K)*T)-N_o; 
+   
 end
 
-summed_part = trace(getQk(Na,ha,val,K)*T); 
- 
 
-e23b = (1/gamma_i)*trace(getQk(Na,hb,ii,K)*T) - summed_part - N_o; %part of eq(23b) for ii
 
 
 end

@@ -3,16 +3,14 @@
 
 Na = 10;
 K = 2;
-k=1;
-ii=1;
-% h_i = gethi(Na); 
-% Qk = getQk(Na,h_i,k,K);
+
+
 Gamma_dB = 15; % dB
 delta = 0.5; % This is a placeholder and need to consult because did not find the value in the paper 
 
 
 SNR_ratio_INR = (10^2);
-Po_dBm = 25;%dBm
+% Po_dBm = 25;%dBm
 No_dBm = 10;
 P_o = 10^(Po_dBm/10) * 0.001;
 N_o =  10^(No_dBm/10) * 0.001;
@@ -36,11 +34,8 @@ er_th = 0.001;
 
 
 
-phi_o = find_phi(All_A,t,SNR_ratio_INR,Na,K,1);   %finding phi
+phi_o = find_phi(All_A,t,SNR_ratio_INR,Na,K,0);   %finding phi
 gam_snr_o = real(trace(phi_o*T));
-%Rw_over_sigma = get_Rw_over_sigma(All_A,wa,SNR_ratio_INR);
-%Z_over_sigma  = Rw_over_sigma + (wa'*wa)/P_o; 
-%Omega = real(10*All_A{1}*wa*wa'*All_A{1}');
 
 %%% Remember to change the channel h_i for each path
 %% CVX Problem setup
@@ -62,10 +57,7 @@ while(diff_abs > tol)
         break;
     end
     cvx_begin sdp
-
-        %     cvx_solver_settings('maxiter', 1000, 'tolerance', 1e-6)
         variable T(Na*K,Na*K) complex hermitian
-    
         maximize( real(trace(phi_o*T)) )
         subject to
             T == semidefinite(Na*K);
@@ -76,11 +68,9 @@ while(diff_abs > tol)
 
     [V,D]=eig(T);
     t = V(:,end);
-%     T = t*t';
     
     prev= current1 ;
-    
-    phi_o = find_phi(All_A,t,SNR_ratio_INR,Na,K,1);   %finding phi
+    phi_o = find_phi(All_A,t,SNR_ratio_INR,Na,K,0);   %finding phi
     current1 = real(trace(phi_o*T)) ;
     diff_abs = abs(current1 - prev);
     count = count+1;
@@ -92,10 +82,6 @@ T_decomp = t*t';
 
 disp('Optimal t');
 disp(t);
-wa = find_wa(All_A,t,SNR_ratio_INR,Na,K);
-R_t_over_sigma_square = get_Rt_over_sigma(All_A,t,SNR_ratio_INR);
-target = (10*abs(wa'*All_A{1}*t)^2);%10*t'*All_A{1}'*wa*wa'*All_A{1}*t;
-SINR_a = target/(wa'*(R_t_over_sigma_square+eye(Na*K))*wa); 
 
-fin_val = 10*log10(current1);
+final_value = 10*log10(current1);
 

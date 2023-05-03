@@ -19,14 +19,14 @@ Rp = INR_p*ap_theta*ap_theta';
 % wa
 Matrix = inv(Rp+eye(Np))*D_p;
 [U,D] = eig(Matrix);
-wp = U(:,2);
+wp = U(:,end);
 % [D, ind] = sort(D);
 % U = U(:, ind);
 
 R_passive_signal = Rp+D_p+eye(Np);
 
 SINRp = (wp'*D_p*wp)/(wp'*(Rp+eye(Np))*wp);
-SINRp2 = (SNR_p*abs(wp'*get_steering_vector(Np,passive_Theta_values(1),delta))^2)/(wp'*(Rp+eye(Np))*wp);
+SINRp2 = SINR_p*abs(wp'*get_steering_vector(Np,passive_Theta_values(1),delta))
 % 
 % % beamforming
 % theta_range = -90:90;
