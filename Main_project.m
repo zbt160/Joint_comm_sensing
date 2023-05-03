@@ -26,7 +26,7 @@ end
 
 
 SNR_ratio_INR = (10^2);
-Po_dBm = 25;%dBm
+% Po_dBm = 25;%dBm
 No_dBm = 10;
 P_o = 10^(Po_dBm/10) * 0.001;
 t = 0.1*ones(Na*K,1);
